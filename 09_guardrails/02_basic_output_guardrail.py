@@ -7,7 +7,7 @@ Output guardrails check and potentially filter agent output before it's returned
 
 import asyncio
 import logging
-from agents import Agent, Runner
+from agents import Agent, Runner, OutputGuardrailTripwireTriggered
 from agents.guardrail import output_guardrail, GuardrailFunctionOutput
 from agents.run_context import RunContextWrapper
 
@@ -21,6 +21,8 @@ def response_safety_guardrail(context: RunContextWrapper, agent: Agent, agent_ou
     Output guardrail that checks for unsafe or inappropriate content in agent responses.
     Returns GuardrailFunctionOutput with tripwire_triggered=True to halt execution.
     """
+    print(f"response_safety_guardrail: {agent_output}")
+    print(f"type: {type(agent_output)}")
     # Convert agent output to string for analysis
     response_text = str(agent_output) if agent_output else ""
 

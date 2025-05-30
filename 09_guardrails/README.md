@@ -34,6 +34,7 @@ Guardrails are checks that run **in parallel** to your agents to:
 ├── 02_basic_output_guardrail.py     # Basic output validation examples
 ├── 03_guardrail_exceptions.py       # Exception handling when guardrails trigger
 ├── 04_agent_based_guardrails.py     # Advanced agent-based guardrails
+├── 05_guardrails_quiz.py            # Interactive quiz to test your understanding
 └── README.md                        # This comprehensive guide
 ```
 
@@ -232,6 +233,9 @@ python decoded/09_guardrails/03_guardrail_exceptions.py
 
 # Agent-based guardrails (requires OpenAI API key)
 python decoded/09_guardrails/04_agent_based_guardrails.py
+
+# Test your understanding with the interactive quiz
+python decoded/09_guardrails/05_guardrails_quiz.py
 ```
 
 ## 🚨 Important Notes

@@ -7,7 +7,7 @@ Input guardrails check and potentially filter user input before it reaches the a
 
 import asyncio
 import logging
-from agents import Agent, Runner
+from agents import Agent, Runner, InputGuardrailTripwireTriggered
 from agents.guardrail import input_guardrail, GuardrailFunctionOutput
 from agents.run_context import RunContextWrapper
 from agents.items import TResponseInputItem
@@ -22,6 +22,9 @@ def content_filter_guardrail(context: RunContextWrapper, agent: Agent, input: st
     Basic input guardrail that checks for inappropriate content.
     Returns GuardrailFunctionOutput with tripwire_triggered=True to halt execution.
     """
+    print(f"content_filter_guardrail: {input}")
+    print(f"context: {context}")
+    print(f"agent: {agent}")
     # Extract user message from input
     if isinstance(input, str):
         user_message = input
@@ -115,6 +118,10 @@ async def demo_input_guardrails():
                         f"Guardrail '{guardrail_result.guardrail.get_name()}': {guardrail_result.output.output_info}")
             else:
                 logger.info("No input guardrail results recorded")
+
+        except InputGuardrailTripwireTriggered as e:
+            logger.info(f"Input guardrail tripwire triggered: {e}")
+            logger.info(f"Input guardrail tripwire triggered: {e.guardrail_result}")
 
         except Exception as e:
             logger.error(f"Error in test case {i}: {e}")

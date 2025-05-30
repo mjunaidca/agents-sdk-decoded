@@ -82,7 +82,8 @@ async def math_homework_guardrail(
     Agent-based input guardrail that detects math homework requests.
     Uses a dedicated guardrail agent to make the determination.
     """
-    logger.info("Running math homework detection guardrail...")
+    logger.info(
+        f"Running math homework detection guardrail... {input} {type(input)}")
 
     # Run the guardrail agent to analyze the input
     guardrail_result = await Runner.run(
@@ -129,7 +130,8 @@ async def content_moderation_guardrail(
     """
     Agent-based output guardrail that moderates content for appropriateness.
     """
-    logger.info("Running content moderation guardrail...")
+    logger.info(
+        f"Running content moderation guardrail... {agent_output} {type(agent_output)}")
 
     # Run the content moderation agent
     guardrail_result = await Runner.run(
@@ -251,9 +253,9 @@ async def demo_agent_based_guardrails():
 
             logger.info(
                 f"  Output guardrails: {len(result.output_guardrail_results)}")
-            for gr in result.output_guardrail_results:
+            for output_gr in result.output_guardrail_results:
                 logger.info(
-                    f"    - {gr.guardrail.get_name()}: {gr.output.output_info.get('status', 'checked')}")
+                    f"    - {output_gr.guardrail.get_name()}: {output_gr.output.output_info.get('status', 'checked')}")
 
         except InputGuardrailTripwireTriggered as e:
             logger.error(
