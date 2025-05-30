@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 02_agent_visualization.py
 
@@ -16,21 +17,11 @@ Based on: https://openai.github.io/openai-agents-python/visualization/
 
 import asyncio
 import tempfile
-import os
 from pathlib import Path
-
-try:
-    import graphviz
-    GRAPHVIZ_AVAILABLE = True
-except ImportError:
-    GRAPHVIZ_AVAILABLE = False
 
 from agents import Agent, function_tool
 from agents.handoffs import handoff
-
-if GRAPHVIZ_AVAILABLE:
-    from agents.extensions.visualization import draw_graph
-
+from agents.extensions.visualization import draw_graph
 # ================== TOOLS FOR EXAMPLES ==================
 
 
@@ -68,48 +59,11 @@ def get_stock_price(symbol: str) -> str:
     """Get current stock price for a symbol."""
     return f"Current price of {symbol}: $150.25 (+2.3%)"
 
-# ================== VISUALIZATION EXAMPLES ==================
-
-
-def demo_installation_check():
-    """Check if visualization dependencies are available."""
-    print("=== Demo: Installation Check ===")
-
-    if GRAPHVIZ_AVAILABLE:
-        print("✅ Graphviz Python package is available")
-
-        # Check if graphviz system package is installed
-        try:
-            import subprocess
-            result = subprocess.run(
-                ['dot', '-V'], capture_output=True, text=True, timeout=5)
-            if result.returncode == 0:
-                print("✅ Graphviz system package is installed")
-                print(f"   Version: {result.stderr.strip()}")
-                return True
-            else:
-                print("❌ Graphviz system package not found")
-                print(
-                    "💡 Install with: brew install graphviz (macOS) or apt-get install graphviz (Ubuntu)")
-                return False
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            print("❌ Graphviz system package not found")
-            print(
-                "💡 Install with: brew install graphviz (macOS) or apt-get install graphviz (Ubuntu)")
-            return False
-    else:
-        print("❌ Graphviz Python package not available")
-        print("💡 Install with: pip install 'openai-agents[viz]'")
-        return False
 
 
 def demo_simple_agent_visualization():
     """Demonstrate basic agent visualization."""
     print("\n=== Demo: Simple Agent Visualization ===")
-
-    if not GRAPHVIZ_AVAILABLE:
-        print("❌ Graphviz not available. Skipping visualization demo.")
-        return None
 
     # Create a simple agent with tools
     simple_agent = Agent(
@@ -122,7 +76,7 @@ def demo_simple_agent_visualization():
         print("🎨 Creating visualization for simple agent...")
 
         # Generate the graph
-        graph = draw_graph(simple_agent)
+        graph = draw_graph(simple_agent, filename="simple_agent_graph.png")
 
         print("✅ Simple agent visualization created")
         print(f"   Agent: {simple_agent.name}")
@@ -144,10 +98,6 @@ def demo_simple_agent_visualization():
 def demo_multi_agent_visualization():
     """Demonstrate multi-agent system visualization."""
     print("\n=== Demo: Multi-Agent System Visualization ===")
-
-    if not GRAPHVIZ_AVAILABLE:
-        print("❌ Graphviz not available. Skipping visualization demo.")
-        return None
 
     # Create specialized agents
     research_agent = Agent(
@@ -189,7 +139,7 @@ def demo_multi_agent_visualization():
         print("🎨 Creating visualization for multi-agent system...")
 
         # Generate the graph
-        graph = draw_graph(triage_agent)
+        graph = draw_graph(triage_agent, filename="multi_agent_graph.png")
 
         print("✅ Multi-agent visualization created")
         print(f"   Main agent: {triage_agent.name}")
@@ -217,10 +167,6 @@ def demo_complex_agent_visualization():
     """Demonstrate complex agent system with multiple levels."""
     print("\n=== Demo: Complex Agent System Visualization ===")
 
-    if not GRAPHVIZ_AVAILABLE:
-        print("❌ Graphviz not available. Skipping visualization demo.")
-        return None
-
     # Level 3: Specialist agents
     weather_specialist = Agent(
         name="WeatherSpecialist",
@@ -231,7 +177,10 @@ def demo_complex_agent_visualization():
     calculation_specialist = Agent(
         name="CalculationSpecialist",
         instructions="I perform complex mathematical calculations.",
-        tools=[calculate]
+        tools=[calculate],
+        handoffs=[
+            handoff(agent=weather_specialist)
+        ]
     )
 
     # Level 2: Department agents
@@ -269,7 +218,7 @@ def demo_complex_agent_visualization():
         print("🎨 Creating visualization for complex agent system...")
 
         # Generate the graph
-        graph = draw_graph(orchestrator)
+        graph = draw_graph(orchestrator, filename="complex_agent_graph.png")
 
         print("✅ Complex system visualization created")
 
@@ -302,10 +251,6 @@ def demo_complex_agent_visualization():
 def demo_graph_customization():
     """Demonstrate graph customization options."""
     print("\n=== Demo: Graph Customization ===")
-
-    if not GRAPHVIZ_AVAILABLE:
-        print("❌ Graphviz not available. Skipping customization demo.")
-        return
 
     # Create a test agent
     test_agent = Agent(
@@ -344,10 +289,6 @@ def demo_graph_customization():
 def demo_save_and_export():
     """Demonstrate saving and exporting graphs."""
     print("\n=== Demo: Save and Export ===")
-
-    if not GRAPHVIZ_AVAILABLE:
-        print("❌ Graphviz not available. Skipping save demo.")
-        return
 
     # Create an agent for export demo
     export_agent = Agent(
@@ -487,22 +428,15 @@ async def main():
     print("\nThis demonstrates how to visualize agent architectures")
     print("using Graphviz for better understanding and documentation.\n")
 
-    # Check if visualization is available
-    if not demo_installation_check():
-        print("\n❌ Visualization dependencies not available.")
-        print("💡 Install with: pip install 'openai-agents[viz]'")
-        print("💡 Also install Graphviz system package for your OS")
-        return
-
     # Run visualization demos
     print("\n" + "="*60)
-    simple_graph = demo_simple_agent_visualization()
+    demo_simple_agent_visualization()
 
     print("\n" + "="*60)
-    multi_graph = demo_multi_agent_visualization()
+    demo_multi_agent_visualization()
 
     print("\n" + "="*60)
-    complex_graph = demo_complex_agent_visualization()
+    demo_complex_agent_visualization()
 
     print("\n" + "="*60)
     demo_graph_customization()
@@ -525,14 +459,6 @@ async def main():
     print("• Include visualizations in team reviews")
     print("• Update visualizations when systems evolve")
 
-    # Optional: Try to view one graph if available
-    if GRAPHVIZ_AVAILABLE and simple_graph:
-        try:
-            print("\n🖼️ To view a graph in a separate window, use: graph.view()")
-            print(
-                "💡 Example: simple_graph.view() # (if graphviz system package is installed)")
-        except:
-            pass
 
 if __name__ == "__main__":
     asyncio.run(main())

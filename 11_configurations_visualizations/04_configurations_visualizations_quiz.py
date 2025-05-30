@@ -17,7 +17,7 @@ Run this to test your knowledge!
 
 import asyncio
 import random
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
 
@@ -467,7 +467,7 @@ class ConfigurationVisualizationQuiz:
         """Shuffle questions for randomized quiz experience."""
         random.shuffle(self.questions)
 
-    def run_quiz(self, num_questions: int = None, difficulty: str = None, category: str = None):
+    def run_quiz(self, num_questions: Optional[int] = None, difficulty: Optional[str] = None, category: Optional[str] = None):
         """Run the interactive quiz."""
         # Filter questions based on criteria
         filtered_questions = self.questions
